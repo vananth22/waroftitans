@@ -30,6 +30,7 @@ public abstract class AbstractTweet {
     private String    actor;
     private String    rawText;
     private String url;
+    private int status;
     
     
     
@@ -192,8 +193,19 @@ public abstract class AbstractTweet {
     }
     
     
-   
     
+    
+   
+    @Column(name = "status")
+    public int getStatus () {
+        return status;
+    }
+
+    public void setStatus (
+                           int status) {
+        this.status = status;
+    }
+
     @Column(name = "url")
     public String getUrl () {
         return url;

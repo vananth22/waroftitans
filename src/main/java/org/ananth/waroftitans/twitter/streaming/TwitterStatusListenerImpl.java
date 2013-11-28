@@ -52,15 +52,30 @@ public class TwitterStatusListenerImpl implements StatusListener {
     public void onStatus (
                           Status status) {
 
+        Tweet tweet = new Tweet();
         if (!status.getText().contains(TweetConstants.RAHUL) && !status.getText().contains(TweetConstants.MODI)) {
-            return;
+            // No competitors in the tweet. status = 0
+            tweet.setStatus(TweetConstants.NO_COMPETITORS_IN_TWEET);
+            tweet.setActor(null);
         }
 
         if (status.getText().contains(TweetConstants.RAHUL) && status.getText().contains(TweetConstants.MODI)) {
-            return;
+            // Both competitors in the tweet. status = 1
+            tweet.setStatus(TweetConstants.BOTH_COMPETITORS_IN_TWEET);
+            tweet.setActor(null);
+        }
+        else {
+            // all fine. only one competitor in the tweet
+            tweet.setStatus(TweetConstants.ONLY_ONE_COMPETITORS_IN_TWEET);
+            if (status.getText().contains(TweetConstants.RAHUL)) {
+                tweet.setActor(TweetConstants.RAHUL);
+            }
+            else {
+                tweet.setActor(TweetConstants.MODI);
+            }
+
         }
 
-        Tweet tweet = new Tweet();
         tweet.setTweetId(status.getId());
         tweet.setCreatedAt(new Timestamp(status.getCreatedAt().getTime()));
         tweet.setText(status.getText());
@@ -79,17 +94,8 @@ public class TwitterStatusListenerImpl implements StatusListener {
             tweet.setUrl(status.getURLEntities()[0].getExpandedURL());
         }
 
-        if (status.getText().contains(TweetConstants.RAHUL)) {
-            tweet.setActor(TweetConstants.RAHUL);
-        }
-        else {
-            tweet.setActor(TweetConstants.MODI);
-        }
-        
-        
-        
         tweetMutationHandler.saveTweet(tweet);
-        
+
         System.out.println("Added in to log::" + tweet.toString());
 
     }
