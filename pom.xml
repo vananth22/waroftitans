@@ -8,6 +8,21 @@
 	<description>The comparative ranking system</description>
 	<packaging>jar</packaging>
 
+	<repositories>
+
+		<repository>
+			<id>boilerpipe-m2-repo</id>
+			<url>http://boilerpipe.googlecode.com/svn/repo/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+	</repositories>
+
 
 	<dependencies>
 		<dependency>
@@ -71,6 +86,28 @@
 			<version>5.1.21</version>
 		</dependency>
 
+		<dependency>
+			<groupId>de.l3s.boilerpipe</groupId>
+			<artifactId>boilerpipe</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.9.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.nekohtml</groupId>
+			<artifactId>nekohtml</artifactId>
+			<version>1.9.13</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
 
 
 
@@ -104,9 +141,8 @@
 		<profile>
 			<id>onejar</id>
 
-
 			<build>
-			<finalName>twitter</finalName>
+				<finalName>twitter</finalName>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>

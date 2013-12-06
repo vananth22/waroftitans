@@ -6,7 +6,9 @@ import org.ananth.waroftitans.analyser.SentimentAnalyzerFunction;
 import org.ananth.waroftitans.analyser.SentimentBean;
 import org.ananth.waroftitans.constants.TweetConstants;
 import org.ananth.waroftitans.domain.TweetMutationHandler;
+import org.ananth.waroftitans.parser.HTMLParserFunction;
 import org.ananth.waroftitans.persistence.Tweet;
+import org.ananth.waroftitans.twitter.TweetTextBuilder;
 
 import twitter4j.StallWarning;
 import twitter4j.Status;
@@ -22,6 +24,8 @@ public class TwitterStatusListenerImpl implements StatusListener {
 
     private final static SentimentAnalyzerFunction sentimentFunction    = new SentimentAnalyzerFunction();
     private final TweetMutationHandler             tweetMutationHandler = new TweetMutationHandler();
+    private final TweetTextBuilder                 tweetTextBuilder     = new TweetTextBuilder();
+    
 
     @Override
     public void onException (
@@ -53,6 +57,8 @@ public class TwitterStatusListenerImpl implements StatusListener {
                           Status status) {
 
         Tweet tweet = new Tweet();
+        
+        
         if (!status.getText().contains(TweetConstants.RAHUL) && !status.getText().contains(TweetConstants.MODI)) {
             // No competitors in the tweet. status = 0
             tweet.setStatus(TweetConstants.NO_COMPETITORS_IN_TWEET);
@@ -86,13 +92,19 @@ public class TwitterStatusListenerImpl implements StatusListener {
             tweet.setLattitude(status.getGeoLocation().getLatitude());
             tweet.setLongitude(status.getGeoLocation().getLongitude());
         }
-        tweet.setRawText(DataObjectFactory.getRawJSON(status));
-        SentimentBean tweetWithSentiment = sentimentFunction.apply(status.getText());
-        tweet.setScore(tweetWithSentiment.getSentimentScore());
-
+        
         if (status.getURLEntities() != null && status.getURLEntities().length > 0) {
             tweet.setUrl(status.getURLEntities()[0].getExpandedURL());
         }
+        
+        tweet.setRawText(DataObjectFactory.getRawJSON(status));
+        SentimentBean tweetWithSentiment = sentimentFunction.apply(this.tweetTextBuilder
+                                                                        .setTweetStatus(status)
+                                                                        .setURLToParse(tweet.getUrl())
+                                                                        .build());
+        tweet.setScore(tweetWithSentiment.getSentimentScore());
+
+        
 
         tweetMutationHandler.saveTweet(tweet);
 

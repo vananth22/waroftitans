@@ -29,11 +29,10 @@ public class TweetMutationHandler {
             this.em.getTransaction().begin();
             this.em.persist(tweet);
             this.em.getTransaction().commit();
+        } catch(Exception e) {
+            e.printStackTrace();
         }
-        finally {
-            this.em.close();
-        }
-
+        
         return tweet;
     }
 
