@@ -50,9 +50,11 @@ public class TweetTextBuilder {
 
         String text = "";
         
+        String title = null;
+        
         
         if(Strings.isNullOrEmpty(this.urlToParse)) {
-            return this.htmlParserFunction.apply(this.urlToParse);
+            title = this.htmlParserFunction.apply(this.urlToParse);
         }
         
 
@@ -71,8 +73,7 @@ public class TweetTextBuilder {
                 text = text.replaceAll(entity.getText(), "");
             }
         }
-
-        return text;
+        return title != null ? title + "," + text : text;        
     }
 
 }
