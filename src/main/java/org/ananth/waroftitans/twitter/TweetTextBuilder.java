@@ -8,16 +8,22 @@ import java.util.List;
 import java.util.Set;
 
 import org.ananth.waroftitans.analyser.EntityClassifier;
+import org.ananth.waroftitans.analyser.EntityTransformFunction;
 import org.ananth.waroftitans.exception.SentimentDataFlowException;
 import org.ananth.waroftitans.parser.HTMLParserFunction;
+import org.ananth.waroftitans.util.PairObject;
+import org.ananth.waroftitans.util.TweetStringUtil;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.pipeline.CleanXmlAnnotator;
+import edu.stanford.nlp.util.StringUtils;
 
 import twitter4j.HashtagEntity;
 
@@ -33,13 +39,13 @@ import twitter4j.UserMentionEntity;
 public final class TweetTextBuilder {    
     
     
-    private Set<String> tweetTextBag = null;
-    private Set<String> stopWordBag = null;
+    private List<String> tweetTextBag = null;
+    private List<String> stopWordBag = null;
         
     
-    private TweetTextBuilder(final Set<String> tweetTextList) {
+    private TweetTextBuilder(final List<String> tweetTextList) {
         this.tweetTextBag = tweetTextList;
-        this.stopWordBag = Sets.newHashSet();
+        this.stopWordBag = Lists.newLinkedList();
     }
     
     
@@ -50,13 +56,15 @@ public final class TweetTextBuilder {
         }
         
         
+        
         if(entities == null || entities.length == 0) {   
         
         
-            return new TweetTextBuilder( Sets.newLinkedHashSet( 
+            return new TweetTextBuilder( Lists.newLinkedList( 
                                                             Splitter.on(" ")
                                                             .trimResults()
-                                                            .split(text)));
+                                                            .omitEmptyStrings()
+                                                            .split(TweetStringUtil.textCleanUp(text))));
         }
         
         
@@ -67,20 +75,22 @@ public final class TweetTextBuilder {
         
         if(Strings.isNullOrEmpty(title)) {
             
-            return new TweetTextBuilder( Sets.newLinkedHashSet( 
+            return new TweetTextBuilder( Lists.newLinkedList( 
                                                             Splitter.on(" ")
                                                             .trimResults()
-                                                            .split(text)));
+                                                            .omitEmptyStrings()
+                                                            .split(TweetStringUtil.textCleanUp(text))));
             
             
             
         }
         
         
-        return new TweetTextBuilder( Sets.newLinkedHashSet( 
+        return new TweetTextBuilder( Lists.newLinkedList( 
                                                         Splitter.on(" ")
                                                         .trimResults()
-                                                        .split(title)));
+                                                        .omitEmptyStrings()
+                                                        .split(TweetStringUtil.textCleanUp(title))));
                         
                        
     }
@@ -101,7 +111,7 @@ public final class TweetTextBuilder {
     }
     
     
-    public TweetTextBuilder removeHashWords(HashtagEntity[] entities) {
+    public TweetTextBuilder removeHashWords(final HashtagEntity[] entities) {
         if(entities == null || entities.length == 0) {
             return this;
         }
@@ -114,14 +124,14 @@ public final class TweetTextBuilder {
     }
     
     
-    public TweetTextBuilder removeUsersWithTweet(UserMentionEntity[] entities) {
+    public TweetTextBuilder removeUsersWithTweet(final UserMentionEntity[] entities) {
         
         if(entities == null || entities.length == 0) {
             return this;
         }
         
         for(UserMentionEntity entity : entities) {
-            this.stopWordBag.add("@" + entity.getScreenName());
+            this.stopWordBag.add("@" + entity.getScreenName() + ":");
         }
         
         return this;
@@ -129,73 +139,39 @@ public final class TweetTextBuilder {
     }
     
     public TweetTextBuilder removeEntity() {
-        
-        final StringBuilder builder = new StringBuilder(); 
-        for(final String text : this.tweetTextBag) {
-            builder.append(text);
-            builder.append(" ");
-        }
-        
-        final String entityDetectionText =  builder.toString().trim();
-        final List<List<CoreLabel>> classifyList = EntityClassifier.getInstance().getCRFClassifier().classify(entityDetectionText); 
-        
-        for (List<CoreLabel> coreLabels : classifyList) {
-            for (CoreLabel coreLabel : coreLabels) {
-                final String entityStatus = coreLabel.get(CoreAnnotations.AnswerAnnotation.class);
-                if(!"O".equalsIgnoreCase(entityStatus.trim())) {
-                    this.stopWordBag.add(coreLabel.word());
-                }          
-             
-            }
-        }        
-        
+        final EntityTransformFunction function = new EntityTransformFunction();
+        this.tweetTextBag = function.apply(this.tweetTextBag);   
         return this;
     }
     
     
     public String build() {
-        final StringBuilder builder = new StringBuilder();        
-        final Set<String> stopWordsIntersection = Sets.difference(this.tweetTextBag, this.stopWordBag);
         
-        for(final String text : stopWordsIntersection) {
-            builder.append(text);
-            builder.append(" ");
-        }
-        
-        return builder.toString().trim();
+        final TweetStopWordTransformerFunction function = new TweetStopWordTransformerFunction();
+        final List<String> transformList = function.apply(PairObject.of(this.tweetTextBag, this.stopWordBag));        
+        return StringUtils.join(TweetStringUtil.cleanupDuplicateElements(transformList));
 
     }
 
 
-    public Set<String> getTweetTextList () {
+    public List<String> getTweetTextList () {
         return tweetTextBag;
     }
 
 
-    public void setTweetTextList (
-                                  Set<String> tweetTextList) {
+    public void setTweetTextList (final List<String> tweetTextList) {
         this.tweetTextBag = tweetTextList;
     }
 
 
-    public Set<String> getStopWordBagList () {
+    public List<String> getStopWordBagList () {
         return stopWordBag;
     }
 
 
-    public void setStopWordBagList (
-                                    Set<String> stopWordBagList) {
+    public void setStopWordBagList (final List<String> stopWordBagList) {
         this.stopWordBag = stopWordBagList;
     }
-    
-   
-    
-    
-     
-
-
-    
-
-   
+ 
 
 }

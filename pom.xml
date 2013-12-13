@@ -120,8 +120,8 @@
 			<artifactId>stanford-parser</artifactId>
 			<version>3.3.0</version>
 		</dependency>
-		
-		
+
+
 		<dependency>
 			<groupId>edu.stanford.nlp</groupId>
 			<artifactId>stanford-corenlp-3.3.0-models</artifactId>
@@ -134,6 +134,13 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.1</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
+		</dependency>
+
 
 
 

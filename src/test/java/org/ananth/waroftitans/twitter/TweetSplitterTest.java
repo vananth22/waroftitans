@@ -4,12 +4,18 @@
 package org.ananth.waroftitans.twitter;
 
 
+import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import org.junit.Test;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import edu.stanford.nlp.util.StringUtils;
 
 /**
  * @author Ananth
@@ -35,6 +41,33 @@ public class TweetSplitterTest {
       
         
         System.out.println(finalResult);
+        
+        
+        
+    }
+    
+    @Test
+    public void testStringUtilJoin() {
+        
+        final List<String> sampleSet = Lists.newLinkedList();
+        sampleSet.add("he");
+        sampleSet.add("he");
+        sampleSet.add("doing");
+        sampleSet.add("it");
+        sampleSet.add("good");
+        sampleSet.add("it");
+        sampleSet.add("it");
+        String lastElement = null;
+        for(String text : sampleSet) {            
+            if(!text.equalsIgnoreCase(lastElement)) {
+                System.out.println(text);
+            }
+            
+            lastElement = text;
+            
+            
+           
+        }
         
         
         
