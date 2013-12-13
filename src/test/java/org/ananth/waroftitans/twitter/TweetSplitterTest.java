@@ -31,8 +31,7 @@ public class TweetSplitterTest {
         Set<String> removeWords = Sets.newHashSet();
         removeWords.add("RT");
         
-        Set<String> finalResult = Sets.difference(Sets.newLinkedHashSet(textIterator), removeWords);
-        
+        Set<String> finalResult = Sets.difference(Sets.newLinkedHashSet(textIterator), removeWords);  
       
         
         System.out.println(finalResult);
