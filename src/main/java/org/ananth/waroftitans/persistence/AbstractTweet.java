@@ -31,6 +31,7 @@ public abstract class AbstractTweet {
     private String    rawText;
     private String url;
     private int status;
+    private String sentimentText;
     
     
     
@@ -214,6 +215,16 @@ public abstract class AbstractTweet {
     public void setUrl (
                         String url) {
         this.url = url;
+    }
+    
+    @Column(name = "sentiment_text")
+    public String getSentimentText () {
+        return sentimentText;
+    }
+
+    public void setSentimentText (
+                                  String sentimentText) {
+        this.sentimentText = sentimentText;
     }
 
     @Override

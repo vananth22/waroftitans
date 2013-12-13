@@ -1,6 +1,7 @@
 package org.ananth.waroftitans.twitter.streaming;
 
 import java.sql.Timestamp;
+import java.util.Locale;
 
 import org.ananth.waroftitans.analyser.SentimentAnalyzerFunction;
 import org.ananth.waroftitans.analyser.SentimentBean;
@@ -24,7 +25,6 @@ public class TwitterStatusListenerImpl implements StatusListener {
 
     private final static SentimentAnalyzerFunction sentimentFunction    = new SentimentAnalyzerFunction();
     private final TweetMutationHandler             tweetMutationHandler = new TweetMutationHandler();
-    private final TweetTextBuilder                 tweetTextBuilder     = new TweetTextBuilder();
     
 
     @Override
@@ -57,27 +57,32 @@ public class TwitterStatusListenerImpl implements StatusListener {
                           Status status) {
 
         Tweet tweet = new Tweet();
-        
-        
-        if (!status.getText().contains(TweetConstants.RAHUL) && !status.getText().contains(TweetConstants.MODI)) {
+
+        if (!status.getText().toUpperCase().contains(TweetConstants.RAHUL.toUpperCase()) && !status.getText().toUpperCase().contains(TweetConstants.MODI.toUpperCase())) {
             // No competitors in the tweet. status = 0
             tweet.setStatus(TweetConstants.NO_COMPETITORS_IN_TWEET);
             tweet.setActor(null);
         }
 
-        if (status.getText().contains(TweetConstants.RAHUL) && status.getText().contains(TweetConstants.MODI)) {
+        if (status.getText().toUpperCase().contains(TweetConstants.RAHUL.toUpperCase()) && status.getText().toUpperCase().contains(TweetConstants.MODI.toUpperCase())) {
             // Both competitors in the tweet. status = 1
             tweet.setStatus(TweetConstants.BOTH_COMPETITORS_IN_TWEET);
             tweet.setActor(null);
         }
         else {
             // all fine. only one competitor in the tweet
-            tweet.setStatus(TweetConstants.ONLY_ONE_COMPETITORS_IN_TWEET);
-            if (status.getText().contains(TweetConstants.RAHUL)) {
+
+            if (status.getText().toUpperCase().contains(TweetConstants.RAHUL.toUpperCase())) {
+                tweet.setStatus(TweetConstants.ONLY_ONE_COMPETITORS_IN_TWEET);
                 tweet.setActor(TweetConstants.RAHUL);
             }
-            else {
+            else if (status.getText().toUpperCase().contains(TweetConstants.MODI.toUpperCase())) {
+                tweet.setStatus(TweetConstants.ONLY_ONE_COMPETITORS_IN_TWEET);
                 tweet.setActor(TweetConstants.MODI);
+            }
+            else {
+                tweet.setStatus(TweetConstants.NO_COMPETITORS_IN_TWEET);
+                tweet.setActor(null);
             }
 
         }
@@ -92,19 +97,20 @@ public class TwitterStatusListenerImpl implements StatusListener {
             tweet.setLattitude(status.getGeoLocation().getLatitude());
             tweet.setLongitude(status.getGeoLocation().getLongitude());
         }
-        
+
         if (status.getURLEntities() != null && status.getURLEntities().length > 0) {
             tweet.setUrl(status.getURLEntities()[0].getExpandedURL());
         }
-        
-        tweet.setRawText(DataObjectFactory.getRawJSON(status));
-        SentimentBean tweetWithSentiment = sentimentFunction.apply(this.tweetTextBuilder
-                                                                        .setTweetStatus(status)
-                                                                        .setURLToParse(tweet.getUrl())
-                                                                        .build());
-        tweet.setScore(tweetWithSentiment.getSentimentScore());
 
-        
+        tweet.setRawText(DataObjectFactory.getRawJSON(status));
+        SentimentBean tweetWithSentiment = sentimentFunction.apply(TweetTextBuilder.on(status.getText(), status.getURLEntities())
+                                                                                    .removeUsersWithTweet(status.getUserMentionEntities())
+                                                                                    .removeHashWords(status.getHashtagEntities())
+                                                                                    .removeURL(status.getURLEntities())
+                                                                                    .removeEntity()
+                                                                                    .build());
+        tweet.setScore(tweetWithSentiment.getSentimentScore());
+        tweet.setSentimentText(tweetWithSentiment.getText());
 
         tweetMutationHandler.saveTweet(tweet);
 

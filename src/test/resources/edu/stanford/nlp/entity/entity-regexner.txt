@@ -1,0 +1,5 @@
+Bachelor of (Arts|Laws|Science|Engineering)	DEGREE
+Lalor	 LOCATION	PERSON
+Labor	 ORGANIZATION
+Modi	 PERSON
+Rahul	 PERSON

@@ -37,6 +37,7 @@ public class TwitterStreamingProcessorFunction implements Callable<String>{
         
         TwitterStream twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
         twitterStream.addListener(twitterStatusListenerImpl);
+        
         twitterStream.filter(this.getFilterQueryBuilder());
         return "success";
     }
