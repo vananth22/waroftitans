@@ -106,8 +106,7 @@ public class TwitterStatusListenerImpl implements StatusListener {
         SentimentBean tweetWithSentiment = sentimentFunction.apply(TweetTextBuilder.on(status.getText(), status.getURLEntities())
                                                                                     .removeUsersWithTweet(status.getUserMentionEntities())
                                                                                     .removeHashWords(status.getHashtagEntities())
-                                                                                    .removeURL(status.getURLEntities())
-                                                                                    .removeEntity()
+                                                                                    .removeURL(status.getURLEntities())                                                                                   
                                                                                     .build());
         tweet.setScore(tweetWithSentiment.getSentimentScore());
         tweet.setSentimentText(tweetWithSentiment.getText());

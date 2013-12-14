@@ -37,9 +37,7 @@ public final class EntityTransformFunction implements Function<List<String> , Li
                     this.entityTransformCollection.add(coreLabel.word());
                 } else if("PERSON".equalsIgnoreCase(entityStatus)) {
                     this.entityTransformCollection.add("he");
-                } else {
-                    this.entityTransformCollection.add("it");
-                }
+                } 
                 
              
             }

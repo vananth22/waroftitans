@@ -19,7 +19,8 @@ public class SentimentAnalyzerFunctionTest {
     private final static String withOutEntity = "you are great sir";
     
     private final static String WITHCAPS = "He HAS PROVED HIMSELF OVER AND AGAIN LOOK AT WE WANT THE SAME DEVELOPMENT FOR INDIA";
-    private final static String WITHLOWER = "He has proved himself over and again look at we want the same development for india";
+    private final static String WITHLOWER = "He has proved himself over and again look at we want the same development for";
+   
     
     private final static String MULTIPLE_ENTITY = "He is a joker with dirty mouth: he ||he appointed him to the for his literary";
     

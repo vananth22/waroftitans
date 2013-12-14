@@ -42,11 +42,10 @@ public class TweetTextBuilderTest {
     public void testWithOutURL() throws TwitterException {
         final Status status = DataObjectFactory.createStatus(property.getProperty("json.without.url"));
         
-       sentimentText = TweetTextBuilder.on(status.getText(), status.getURLEntities())
+       sentimentText = TweetTextBuilder.on(status.getText(), status.getURLEntities())                                                   
                                                     .removeUsersWithTweet(status.getUserMentionEntities())
                                                     .removeHashWords(status.getHashtagEntities())
-                                                    .removeURL(status.getURLEntities())
-                                                    .removeEntity()
+                                                    .removeURL(status.getURLEntities())                                                   
                                                     .build();
         
         System.out.println(sentimentText);
@@ -54,7 +53,7 @@ public class TweetTextBuilderTest {
     
     @Test
     public void testSentiment() {
-        SentimentBean bean = function.apply(sentimentText);
+        SentimentBean bean = function.apply(sentimentText.toLowerCase());
         
         System.out.println(bean);
         

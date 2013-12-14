@@ -131,17 +131,17 @@ public final class TweetTextBuilder {
         }
         
         for(UserMentionEntity entity : entities) {
-            this.stopWordBag.add("@" + entity.getScreenName() + ":");
+            this.stopWordBag.add("@" + entity.getScreenName());
         }
         
         return this;
         
     }
     
-    public TweetTextBuilder removeEntity() {
+    private List<String> removeEntity(final List<String> transformList) {
         final EntityTransformFunction function = new EntityTransformFunction();
-        this.tweetTextBag = function.apply(this.tweetTextBag);   
-        return this;
+        final List<String> entityTransformList = function.apply(transformList);
+        return entityTransformList;
     }
     
     
@@ -149,7 +149,7 @@ public final class TweetTextBuilder {
         
         final TweetStopWordTransformerFunction function = new TweetStopWordTransformerFunction();
         final List<String> transformList = function.apply(PairObject.of(this.tweetTextBag, this.stopWordBag));        
-        return StringUtils.join(TweetStringUtil.cleanupDuplicateElements(transformList));
+        return StringUtils.join(TweetStringUtil.cleanupDuplicateElements(this.removeEntity(transformList))).toLowerCase();
 
     }
 
