@@ -14,23 +14,27 @@ import org.ananth.waroftitans.persistence.Tweet;
  */
 public class TweetMutationHandler {
 
-    private final EntityManager em;
+    private final EntityManagerFactory factory;
     private static final String PERSISTENCE_UNIT_NAME = "WAR_OF_TITANS";
 
     public TweetMutationHandler() {
-        final EntityManagerFactory factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
-        this.em = factory.createEntityManager();
+        this.factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+        
     }
 
     public Tweet saveTweet (
                             final Tweet tweet) {
+        
+        final EntityManager em = factory.createEntityManager();
 
         try {
-            this.em.getTransaction().begin();
-            this.em.persist(tweet);
-            this.em.getTransaction().commit();
+            em.getTransaction().begin();
+            em.persist(tweet);
+            em.getTransaction().commit();
         } catch(Exception e) {
             e.printStackTrace();
+        } finally {
+            em.close();
         }
         
         return tweet;
